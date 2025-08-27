@@ -3,8 +3,6 @@ services:
   mysql:
     image: mysql:8.0
     container_name: myapp_mysql_prod
-    env_file:
-      - .env.production
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -25,8 +23,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile.production
     container_name: myapp_backend_prod
-    env_file:
-      - .env.production
     ports:
       - "127.0.0.1:8000:8000" # Bind to localhost only
     environment:
@@ -55,8 +51,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.production
     container_name: myapp_frontend_prod
-    env_file:
-      - .env.production
     ports:
       - "127.0.0.1:3000:80" # Bind to localhost only
     environment:
