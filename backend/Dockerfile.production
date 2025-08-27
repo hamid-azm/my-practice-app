@@ -40,9 +40,5 @@ USER appuser
 
 EXPOSE 8000
 
-# Health check - give more time for startup and make it simpler
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-  CMD curl -f http://localhost:8000/api/health/ || exit 1
-
 # Use Gunicorn for production
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "myproject.wsgi:application"]

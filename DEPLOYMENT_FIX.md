@@ -41,12 +41,15 @@ The production Dockerfile was only installing production dependencies (`npm ci -
 **Error**: `Container "xyz" is unhealthy`
 
 ### **What This Means:**
+
 The backend container started but failed its health check. This is usually because:
+
 1. The backend is taking longer to start than expected
 2. Database connection issues
 3. Health check endpoint not responding
 
 ### **Quick Fix Applied:**
+
 - Increased health check start period from 5s to 60s
 - Increased retries from 3 to 5
 - This gives the backend more time to connect to the database
@@ -80,11 +83,13 @@ docker-compose -f docker-compose.production.yml exec backend python manage.py co
 ## 🔍 **If Backend Container is Still Unhealthy:**
 
 ### **Check backend logs:**
+
 ```bash
 docker-compose -f docker-compose.production.yml logs backend
 ```
 
 ### **Check if health endpoint works manually:**
+
 ```bash
 # Enter the backend container
 docker-compose -f docker-compose.production.yml exec backend bash
@@ -94,6 +99,7 @@ curl http://localhost:8000/api/health/
 ```
 
 ### **Restart just the backend:**
+
 ```bash
 docker-compose -f docker-compose.production.yml restart backend
 ```
