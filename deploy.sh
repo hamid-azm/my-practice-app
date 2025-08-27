@@ -8,7 +8,7 @@ set -e  # Exit on any error
 echo "🚀 Starting deployment..."
 
 # Configuration
-REPO_URL="https://github.com/yourusername/your-repo-name.git"  # Update this
+REPO_URL="https://github.com/hamid-azm/my-practice-app.git"
 APP_DIR="/var/www/my-practice-app"
 ENV_FILE="$APP_DIR/.env.production"
 
@@ -123,94 +123,9 @@ EOF
 # Setup Nginx configuration
 print_status "Setting up Nginx configuration..."
 
-# Main site configuration
-cat > /etc/nginx/sites-available/testingonvps.online << 'EOF'
-server {
-    listen 80;
-    server_name testingonvps.online;
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name testingonvps.online;
-
-    ssl_certificate /etc/ssl/certs/testingonvps.online.crt;
-    ssl_certificate_key /etc/ssl/private/testingonvps.online.key;
-
-    # SSL configuration
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
-    ssl_prefer_server_ciphers off;
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-EOF
-
-# API site configuration
-cat > /etc/nginx/sites-available/api.testingonvps.online << 'EOF'
-server {
-    listen 80;
-    server_name api.testingonvps.online;
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name api.testingonvps.online;
-
-    ssl_certificate /etc/ssl/certs/api.testingonvps.online.crt;
-    ssl_certificate_key /etc/ssl/private/api.testingonvps.online.key;
-
-    # SSL configuration
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
-    ssl_prefer_server_ciphers off;
-
-    # Django API
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-        
-        # Security headers
-        add_header X-Frame-Options "SAMEORIGIN" always;
-        add_header X-Content-Type-Options "nosniff" always;
-        add_header X-XSS-Protection "1; mode=block" always;
-        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    }
-
-    # Static files
-    location /static/ {
-        alias /var/www/my-practice-app/backend/staticfiles/;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-
-    # Media files
-    location /media/ {
-        alias /var/www/my-practice-app/backend/media/;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-}
-EOF
+# Copy nginx configurations from repository
+cp $APP_DIR/nginx/testingonvps.online.conf /etc/nginx/sites-available/testingonvps.online
+cp $APP_DIR/nginx/api.testingonvps.online.conf /etc/nginx/sites-available/api.testingonvps.online
 
 # Enable sites
 ln -sf /etc/nginx/sites-available/testingonvps.online /etc/nginx/sites-enabled/
