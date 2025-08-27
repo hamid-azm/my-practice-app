@@ -55,11 +55,11 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'NAME': config('DB_NAME', default='myapp_db'),
+        'USER': config('DB_USER', default='root'),
+        'PASSWORD': config('DB_PASSWORD', default='password'),
+        'HOST': config('DB_HOST', default='mysql'),
+        'PORT': config('DB_PORT', default='3306'),
     }
 }
 
@@ -73,6 +73,21 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Static files
 STATIC_URL = '/static/'
+STATIC_ROOT = '/app/staticfiles'
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/app/media'
+
+# Production settings
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 # REST Framework
 REST_FRAMEWORK = {
