@@ -1,22 +1,40 @@
-# 🚨 DEPLOYMENT ERROR FIX
+# 🚨 DEPLOYMENT ERRORS FIX
 
-## Problem: Environment Variables Not Found During Docker Build
+## Problem 1: Backend - Environment Variables Not Found During Docker Build
 
 **Error**: `DB_NAME not found. Declare it as envvar or define a default value.`
 
-## ✅ **Fixed!**
+## Problem 2: Frontend - TypeScript Compiler Not Found
 
-The issue was that Django was trying to load environment variables during the Docker build process, but those variables are only available when the container runs.
+**Error**: `sh: tsc: not found`
+
+## ✅ **Both Issues Fixed!**
+
+### **Backend Issue**:
+
+Django was trying to load environment variables during the Docker build process, but those variables are only available when the container runs.
+
+### **Frontend Issue**:
+
+The production Dockerfile was only installing production dependencies (`npm ci --only=production`), but TypeScript and build tools are dev dependencies.
 
 ### **What I Fixed:**
 
-1. **Removed `collectstatic` from Dockerfile** - Now runs after container starts
-2. **Added default values** to Django settings for database configuration
-3. **Added proper static files configuration** for production
+1. **Backend**:
+
+   - Removed `collectstatic` from Dockerfile - Now runs after container starts
+   - Added default values to Django settings for database configuration
+   - Added proper static files configuration for production
+
+2. **Frontend**:
+   - Changed `npm ci --only=production` to `npm ci` to install ALL dependencies
+   - This includes TypeScript and Vite build tools needed for the build process
 
 ### **Updated Files:**
+
 - ✅ `backend/Dockerfile.production` - Removed collectstatic from build
 - ✅ `backend/myproject/settings.py` - Added default values and production config
+- ✅ `frontend/Dockerfile.production` - Install all dependencies for build
 
 ## 🚀 **Now Try Deployment Again:**
 
@@ -44,17 +62,21 @@ docker-compose -f docker-compose.production.yml ps
 ## 🔍 **If You Still Get Errors:**
 
 ### **Check environment file:**
+
 ```bash
 cat .env.production
 ```
+
 Make sure it contains all required variables.
 
 ### **Check container logs:**
+
 ```bash
 docker-compose -f docker-compose.production.yml logs backend
 ```
 
 ### **Check if containers are running:**
+
 ```bash
 docker ps
 ```
