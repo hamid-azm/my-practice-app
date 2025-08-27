@@ -32,11 +32,26 @@ The production Dockerfile was only installing production dependencies (`npm ci -
 
 ### **Updated Files:**
 
-- ✅ `backend/Dockerfile.production` - Removed collectstatic from build
+- ✅ `backend/Dockerfile.production` - Removed collectstatic from build + improved health check
 - ✅ `backend/myproject/settings.py` - Added default values and production config
 - ✅ `frontend/Dockerfile.production` - Install all dependencies for build
 
-## 🚀 **Now Try Deployment Again:**
+## Problem 3: Backend Container Unhealthy
+
+**Error**: `Container "xyz" is unhealthy`
+
+### **What This Means:**
+The backend container started but failed its health check. This is usually because:
+1. The backend is taking longer to start than expected
+2. Database connection issues
+3. Health check endpoint not responding
+
+### **Quick Fix Applied:**
+- Increased health check start period from 5s to 60s
+- Increased retries from 3 to 5
+- This gives the backend more time to connect to the database
+
+## 🚀 **Current Status - Try Deployment:**
 
 ```bash
 # On your VPS, try the deployment again
@@ -45,21 +60,43 @@ cd /var/www/my-practice-app
 # Pull the latest fixes
 git pull origin main
 
-# Build and start containers (should work now)
+# Build and start containers
 docker-compose -f docker-compose.production.yml up --build -d
 
-# Wait for containers to start
-sleep 30
+# Wait for containers to start (backend needs time to connect to database)
+sleep 60
 
-# Setup database (collectstatic runs here, not during build)
+# Check container status
+docker-compose -f docker-compose.production.yml ps
+
+# If backend shows as unhealthy, check logs
+docker-compose -f docker-compose.production.yml logs backend
+
+# Setup database (only if backend is running)
 docker-compose -f docker-compose.production.yml exec backend python manage.py migrate
 docker-compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
-
-# Check if containers are running
-docker-compose -f docker-compose.production.yml ps
 ```
 
-## 🔍 **If You Still Get Errors:**
+## 🔍 **If Backend Container is Still Unhealthy:**
+
+### **Check backend logs:**
+```bash
+docker-compose -f docker-compose.production.yml logs backend
+```
+
+### **Check if health endpoint works manually:**
+```bash
+# Enter the backend container
+docker-compose -f docker-compose.production.yml exec backend bash
+
+# Test the health endpoint from inside
+curl http://localhost:8000/api/health/
+```
+
+### **Restart just the backend:**
+```bash
+docker-compose -f docker-compose.production.yml restart backend
+```
 
 ### **Check environment file:**
 
