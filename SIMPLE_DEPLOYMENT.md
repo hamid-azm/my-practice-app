@@ -6,6 +6,8 @@
 - **3 Docker Services**: MySQL + Django Backend + React Frontend ✅
 - **Nginx Config Files**: Ready to copy to your VPS ✅
 - **SSL Certificates**: Let's Encrypt already configured ✅
+- **Simplified Setup**: No health checks for easier deployment ✅
+- **Environment File**: Simple `.env` file on VPS ✅
 
 ---
 
@@ -28,18 +30,18 @@ cd my-practice-app
 ### **Step 3: Create environment file**
 
 ```bash
-nano .env.production
+nano .env
 ```
 
-**Copy and paste this, then update passwords:**
+**Copy and paste this (testing values ready to use):**
 
 ```env
 DB_NAME=myapp_production
 DB_USER=app_user
-DB_PASSWORD=your_secure_password_123
+DB_PASSWORD=testing_password_123
 DB_HOST=mysql
 DB_PORT=3306
-DJANGO_SECRET_KEY=your_super_secure_secret_key_minimum_50_characters_long
+DJANGO_SECRET_KEY=testing_django_secret_key_for_learning_purposes_minimum_50_characters_12345
 DEBUG=False
 ALLOWED_HOSTS=api.testingonvps.online,testingonvps.online,localhost
 SECURE_SSL_REDIRECT=True
@@ -167,7 +169,7 @@ docker-compose -f docker-compose.production.yml logs -f
 # Check if MySQL container is running
 docker ps
 # Check environment variables
-cat .env.production
+cat .env
 ```
 
 ### **Nginx errors:**
@@ -206,7 +208,7 @@ The `nginx/` folder contains 2 configuration files:
 
 ```bash
 cd /var/www && git clone https://github.com/hamid-azm/my-practice-app.git && cd my-practice-app
-nano .env.production  # Add your passwords
+nano .env  # Add your testing passwords
 docker-compose -f docker-compose.production.yml up --build -d
 sleep 30 && docker-compose -f docker-compose.production.yml exec backend python manage.py migrate
 docker-compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
