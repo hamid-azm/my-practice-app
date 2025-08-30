@@ -39,8 +39,8 @@ services:
     depends_on:
       - mysql
     volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - ./backend/staticfiles:/app/staticfiles
+      - ./backend/media:/app/media
     restart: unless-stopped
     networks:
       - app-network
@@ -62,8 +62,6 @@ services:
 
 volumes:
   mysql_prod_data:
-  static_volume:
-  media_volume:
 
 networks:
   app-network:
